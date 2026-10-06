@@ -1,0 +1,26 @@
+# Runtime parameters — loaded by the registry and passed as Graph(config=...).
+# Separate from config/agent.yaml (the static manifest, which carries identity
+# and compile-time requirements only). The standalone entry point
+# (src/api/server.py) loads this file the same way.
+#
+# Every key below has a reader. The research_report block is forwarded to the
+# inner workflow graph and seeded into its state, because node execute()
+# methods take no config argument — state seeding is the only route a runtime
+# value can travel into a domain node.
+
+# Retry routing ceiling of the outer backbone (consumed by the framework base graph).
+max_retry: 3
+# Reserved framework key; this deterministic pipeline makes no external call to bound.
+timeout_s: 30
+
+research_report:
+  # Working-set cap after relevance ranking: at most this many materials are
+  # synthesized and cited. Integer in [1, 50]. Read by the ingestion step;
+  # changing it changes the number of citations in the released report.
+  max_materials: 8
+  # Operator-supplied reference documents, ranked alongside the caller's
+  # materials on every request (same schema and bounds as
+  # input_context.research_materials; validated at compile time). Leave empty
+  # to rely on caller-supplied materials, or on the built-in reference corpus
+  # when a request supplies none.
+  inline_documents: []
